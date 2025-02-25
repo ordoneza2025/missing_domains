@@ -3,7 +3,7 @@ The purpose of this workflow is to explore alternative isoforms at a transcripto
 ## Generating a representative transcriptome
 ## Predicting ORFs from transcripts
 ## Identifying missing domains of alternative transcripts - workflow
-### Annotating ORFs
+### 1. Annotating ORFs
 
-Use BLASTp to annotate the FASTA file of best ORF preidctions for assembled transcripts, using the human swissprot record as the subject refrence. The output will be BLAST table outfmt 6. 
+Use BLASTp to annotate the FASTA file of best ORF preidctions for assembled transcripts, using the human swissprot record as the subject database. The output will be BLAST table outfmt 6. 
 https://github.com/ordoneza2025/missing_domains/blob/main/blastp.sbatch
