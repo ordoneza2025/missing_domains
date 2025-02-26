@@ -3,7 +3,18 @@ The purpose of this workflow is to explore alternative isoforms at a transcripto
 ## Generating a representative transcriptome
 ## Predicting ORFs from transcripts
 ## Identifying missing domains of alternative transcripts - workflow
+
 ### 1. Annotating ORFs
 
-Use BLASTp to annotate the FASTA file of best ORF preidctions for assembled transcripts, using the human swissprot record as the subject database. The output will be BLAST table outfmt 6. 
+The following SLURM script runs BLASTp to annotate the FASTA file of best ORF preidctions for assembled transcripts, using the human swissprot record as the subject database. The output will be BLAST table outfmt 6. 
 https://github.com/ordoneza2025/missing_domains/blob/main/blastp.sbatch
+
+### 2. Finding truncations in bat transcripts
+
+The following PYTHON script parses through the human swissprot and the bat best ORFs FASTA files. It uses the BLASTp output to match sequences, which are then aligned by MUSCLE. Any alignment gaps larger than 5 amino acids are flagged as truncations. Coordinates for the gap regions correspondant to human amino acid sequences are written into a BED format file. The script is submitted via SLURM.
+
+
+
+
+
+
