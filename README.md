@@ -12,6 +12,7 @@ https://github.com/ordoneza2025/missing_domains/blob/main/blastp.sbatch
 ### 2. Finding truncations in bat transcripts
 
 The following PYTHON script parses through the human swissprot and the bat best ORFs FASTA files. It uses the BLASTp output to match sequences, which are then aligned by MUSCLE. Any alignment gaps larger than 5 amino acids are flagged as truncations. Coordinates for the gap regions correspondant to human amino acid sequences are written into a BED format file. The script is submitted via SLURM.
+https://github.com/ordoneza2025/missing_domains/blob/main/identifying_truncations.sbatch
 
 
 
