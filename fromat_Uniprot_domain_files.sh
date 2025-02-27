@@ -55,10 +55,22 @@ sed -E 's/^([^ \t]+)[ \t]+([0-9]+)-([0-9]+)/\1\t\2\t\3/' cyto.2.txt | sort > cyt
 
 ##UnipLocTransMem.bed an UnipLocExtra.bed were processed with the sames steps as UnipLocCytopl.bed
 
+##The last step is to add the protein names to each bed file. Starting from the dowloaded swissprot.fasta record
+awk -F '[| ]+' '/^>/ {split($3, name, "_"); print $2 "\t" name[1]}' swissprot.fasta > protein_names.txt
 
+# Define the mapping file
+map_file="protein_names.txt"
 
+# Loop through all .bed files in the directory
+for bedfile in *.bed; do
+    # Skip the output files to avoid reprocessing
+    [[ "$bedfile" == *.protnames.bed ]] && continue
 
+    # Define output file name
+    output="${bedfile%.bed}.protnames.bed"
 
+    # Run awk command
+    awk 'BEGIN { OFS="\t" } NR==FNR { map[$1]=$2; next } { print $0, map[$1] }' "$map_file" "$bedfile" > "$output"
 
-
-
+    echo "Processed $bedfile -> $output"
+done
