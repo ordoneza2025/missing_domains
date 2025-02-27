@@ -8,11 +8,10 @@ These data files are found in the downloadable data for humans in ucsc.
 https://hgdownload.soe.ucsc.edu/gbdb/hg38/uniprot/
 
 1. **UnipDomain.bb** - annotated domains
-2. **UnipFullSeq.bb** - summary of location of protein and its functions if known. This file will not be considered as its just a summary of the full protein location. 
-3. **UnipLocCytopl.bb** - Cytoplasmic domains.
-4. **UnipLocExtra.bb** - Extracellular domains.
-5. **UnipLocSignal.bb** - signal peptide sequences. 
-6. **UnipLocTransMemb.bb** - transmembrane domains.
+2. **UnipLocCytopl.bb** - Cytoplasmic domains.
+3. **UnipLocExtra.bb** - Extracellular domains.
+4. **UnipLocSignal.bb** - signal peptide sequences. 
+5. **UnipLocTransMemb.bb** - transmembrane domains.
 
 These files contain both Swissprot (validated) and Trembl (computational annotation) 
 
@@ -28,8 +27,14 @@ https://github.com/ordoneza2025/missing_domains/blob/main/blastp.sbatch
 
 ### 2. Finding truncations in bat transcripts
 
-The following PYTHON script parses through the human swissprot and the bat best ORFs FASTA files. It uses the BLASTp output to match sequences, which are then aligned by MUSCLE. Any alignment gaps larger than 5 amino acids are flagged as truncations. Coordinates for the gap regions correspondant to human amino acid sequences are written into a BED format file. The script is submitted via SLURM.
+The following script parses through the human swissprot and the bat best ORFs FASTA files. It uses the BLASTp output to match sequences, which are then aligned by MUSCLE. Any alignment gaps larger than 5 amino acids are flagged as truncations. Coordinates for the gap regions correspondant to human amino acid sequences are written into a BED format file. 
 https://github.com/ordoneza2025/missing_domains/blob/main/identifying_truncations.sbatch
+
+### 3. Assigning truncations to protein domains
+
+The following script uses bedtools to intersect the truncations identifies in STEP2 with protein domains, based on amino acid coordinates. The commands will be ran for each of the 5 domain files described above.   
+
+
 
 
 
