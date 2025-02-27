@@ -17,6 +17,7 @@ https://hgdownload.soe.ucsc.edu/gbdb/hg38/uniprot/
 These files contain both Swissprot (validated) and Trembl (computational annotation) 
 
 The following bash commands will convert .bb files .bed files and re-format them. 
+https://github.com/ordoneza2025/missing_domains/blob/main/fromat_Uniprot_domain_files.sh
    
 ## Identifying missing domains of alternative transcripts - workflow
 
