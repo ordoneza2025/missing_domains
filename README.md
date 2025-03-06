@@ -1,6 +1,18 @@
 # Identifying missing domains of alternative bat isoforms 
-The purpose of this workflow is to explore alternative isoforms at a transcriptome wide level in two bat species: *Artibeus Jamaicensis* and *Eptesicus Fuscus*. Starting from generated long-read and short-read RNA sequencing, we will assemble a representative transcriptome from a panel of tissues for each of the species. We will then identify instances of alternative isoforms and use protein domain annotation to try to predict something about the function of these isoforms. As most alternative isoforms result in the loss of sequences, we will be focusing on finding which domains would be missing or truncated.    
+The purpose of this workflow is to explore alternative isoforms at a transcriptome wide level in two bat species: *Artibeus jamaicensis* and *Eptesicus fuscus*. Starting from generated long-read and short-read RNA sequencing, we will assemble a representative transcriptome from a panel of tissues for each of the species. We will then identify instances of alternative isoforms and use protein domain annotation to try to predict something about the function of these isoforms. As most alternative isoforms result in the loss of sequences, we will be focusing on finding which domains would be missing or truncated.    
 ## Generating a representative transcriptome
+
+### Stringtie2 transcriptome assembly
+
+The following scripts will run Stringtie2 transcriptome assembly in three ways: from short-read RNAseq alignment file, from long-read RNAseq alignment file, and from both to produce a hybrid assembly. The reference transcript GTF file for each species was downloaded from UCSC and used to guide stringtie assembly. 
+
+*Artibeus jamaicensis* - https://hgdownload.soe.ucsc.edu/hubs/GCF/021/234/435/GCF_021234435.1/genes/GCF_021234435.1_CSHL_Jam_final.ncbiRefSeq.gtf.gz
+*Eptesicus fuscus* - https://hgdownload.soe.ucsc.edu/hubs/GCF/027/574/615/GCF_027574615.1/genes/GCF_027574615.1_DD_ASM_mEF_20220401.ncbiRefSeq.gtf.gz
+
+Short_Read assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_short_read.sbatch
+Long_Read assebmly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_long_read.sbatch
+Hybrid_assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_hybrid.sbatch 
+
 ## Predicting ORFs from transcripts
 ## Downloading and re-formatting Uniprot domain files 
 
