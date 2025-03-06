@@ -20,8 +20,11 @@
 
 # Run Stringtie2
 
+echo "Stringtie version: "$(stringtie --version)
+pwd; hostname; date
+
 stringtie ${inFile} -p 8 #threads \
--A ${outDir}/AJ_all_sr.gene_abund.tab \
+-A ${outDir}/AJ_all_sr.gene_abund.tab #RSEM transcript quantification \
 --rf #library strandedness \
 -G ${refFile} \
 -o ${outDir}/AJ_panel_sr.gtf
