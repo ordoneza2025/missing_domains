@@ -10,7 +10,9 @@ The following scripts will run Stringtie2 transcriptome assembly in three ways: 
 *Eptesicus fuscus* - https://hgdownload.soe.ucsc.edu/hubs/GCF/027/574/615/GCF_027574615.1/genes/GCF_027574615.1_DD_ASM_mEF_20220401.ncbiRefSeq.gtf.gz
 
 Short_Read assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_short_read.sbatch
+
 Long_Read assebmly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_long_read.sbatch
+
 Hybrid_assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_hybrid.sbatch 
 
 ## Predicting ORFs from transcripts
