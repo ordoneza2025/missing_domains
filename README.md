@@ -7,6 +7,7 @@ The purpose of this workflow is to explore alternative isoforms at a transcripto
 The following scripts will run Stringtie2 transcriptome assembly in three ways: from short-read RNAseq alignment file, from long-read RNAseq alignment file, and from both to produce a hybrid assembly. The reference transcript GTF file for each species was downloaded from UCSC and used to guide stringtie assembly. 
 
 *Artibeus jamaicensis* - https://hgdownload.soe.ucsc.edu/hubs/GCF/021/234/435/GCF_021234435.1/genes/GCF_021234435.1_CSHL_Jam_final.ncbiRefSeq.gtf.gz
+
 *Eptesicus fuscus* - https://hgdownload.soe.ucsc.edu/hubs/GCF/027/574/615/GCF_027574615.1/genes/GCF_027574615.1_DD_ASM_mEF_20220401.ncbiRefSeq.gtf.gz
 
 Short_Read assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_short_read.sbatch
@@ -15,7 +16,14 @@ Long_Read assebmly: https://github.com/ordoneza2025/missing_domains/blob/main/st
 
 Hybrid_assembly: https://github.com/ordoneza2025/missing_domains/blob/main/stringtie_hybrid.sbatch 
 
+The final transcriptome assembly used is a merged GTF will all non-redundant transcripts from each of the three stringtie assemblies and the RefSeq reference GTF. This is done through the GffCompare utility.
+
+https://github.com/ordoneza2025/missing_domains/blob/main/gffcompare.sbatch
+
+From the output files, the combined GTF is what we used for all subsequent analysis. 
+
 ## Predicting ORFs from transcripts
+
 ## Downloading and re-formatting Uniprot domain files 
 
 These data files are found in the downloadable data for humans in ucsc. 
