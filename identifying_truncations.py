@@ -1,33 +1,12 @@
-#!/bin/bash
-
-##General Settings
-#SBATCH --mail-type=ALL
-#SBATCH --mail-user=anor9792@colorado.edu
-#SBATCH --nodes=1
-#SBATCH --ntasks=8
-#SBATCH --mem=24gb
-#SBATCH --time=72:00:00
-#SBATCH --partition=long
-
-##Job name and output
-#SBATCH --job-name=identifying_truncations
-#SBATCH --output=/scratch/Users/anor9792/eofiles/%x.%j.out
-#SBATCH --error=/scratch/Users/anor9792/eofiles/%x.%j.err
-
 
 ## Example usage
-## blastp_output=. best_orfs_fasta=. swissprot_fasta=.  sbatch identifying_truncations.sbatch
+## blastp_output=. best_orfs_fasta=. swissprot_fasta=.  Submit job through slurm by running sbatch identifying_truncations.sbatch
 
 #Import programs requires to handle sequence info and carry out alignment
 from Bio import SeqIO
 from Bio.Align.Applications import MuscleCommandline
 import subprocess
 import os
-
-# Step 1: Parse BLASTp Output
-
-blastp_output=.  # Input BLASTp output file
-parsed_blastp_file = "parsed_blastp.txt"  # Intermediate output file
 
 # Parse the BLASTp output file to extract Bat protein and SwissProt IDs
 with open(blastp_output, "r") as blastp_file, open(parsed_blastp_file, "w") as outfile:
@@ -41,8 +20,8 @@ with open(blastp_output, "r") as blastp_file, open(parsed_blastp_file, "w") as o
 
 # Step 2: Parse human and bat sequences
 
-best_orfs_fasta =.  # Bat protein sequences
-swissprot_fasta =.  # Human protein sequences
+best_orfs_fasta = "AJ_bestorfs_pep.fasta"  # Bat protein sequences
+swissprot_fasta = "swissprot.fasta"  # Human protein sequences
 parsed_blastp_file = "parsed_blastp.txt"  # Input from step 1
 sequences_file = "sequences.txt"  # Output file for sequences
 
@@ -143,7 +122,7 @@ with open(input_file, "r") as infile, open(output_file, "w") as outfile:
             current_type = "Bat"
         elif line.startswith(">Human_"):
             current_type = "Human"
-        elif line.startswith("STRG."):
+        elif line.startswith("TCONS_"):
             # Write the previous pair if it exists
             if current_pair:
                 aligned = f"{current_pair['id']}\t{current_pair['ref_id']}\t{current_sequences['Bat']}\t{current_sequences['Human']}"
@@ -162,13 +141,11 @@ with open(input_file, "r") as infile, open(output_file, "w") as outfile:
         outfile.write(aligned + "\n")
 
 
-#Step 5: create bed file with truncated domain ranges (gaps larger than 5 amino acids)
+#Step 5: create bed file with truncated domain ranges (gaps larger than 10 amino acids)
 
 alignment_file = "rearranged_musc3_output.txt"  # Input from step 3
 output_file = "missing_regions_human.bed"  # Final output in BED format
 
-
-#Step 4: Find gaps in the aligned Bat sequence and write gap regions correspondant to human aa coordinates to BED format
 
 # Open the alignment file for reading and output file for writing
 with open(alignment_file, "r") as infile, open(output_file, "w") as outfile:
@@ -187,8 +164,8 @@ with open(alignment_file, "r") as infile, open(output_file, "w") as outfile:
                 gap_end = i if aligned_bat[i] != "-" else i + 1
                 gap_length = gap_end - gap_start
                 
-                # Process gaps larger than 5
-                if gap_length > 5:
+                # Process gaps larger than 10
+                if gap_length > 10:
                     # Extract the corresponding region from the aligned human sequence
                     human_gap_region = aligned_human[gap_start:gap_end]
                     
@@ -203,3 +180,45 @@ with open(alignment_file, "r") as infile, open(output_file, "w") as outfile:
                 
                 # Reset gap start for the next potential gap
                 gap_start = None
+
+
+#Step 6: load program to merge adjacent gaps into one.
+
+from collections import defaultdict
+
+input_bed = "missing_regions_human.bed"
+merged_bed = "missing_regions_human_merged.bed"
+
+#Step 7: Merge nearby gaps (≤15 aa apart) per bat isoform
+gaps_by_protein = defaultdict(list)
+
+# Read original bed entries
+with open(input_bed, "r") as infile:
+    for line in infile:
+        ref_id, start, end, bat_protein = line.strip().split("\t")
+        gaps_by_protein[bat_protein].append((ref_id, int(start), int(end)))
+
+# Merge gaps ≤15 aa apart
+with open(merged_bed, "w") as outfile:
+    for bat_protein, gaps in gaps_by_protein.items():
+        # Sort gaps by start coordinate
+        sorted_gaps = sorted(gaps, key=lambda x: x[1])
+        merged = []
+        
+        current_ref, current_start, current_end = sorted_gaps[0]
+        
+        for ref_id, start, end in sorted_gaps[1:]:
+            if start - current_end <= 15:
+                # Extend the current gap
+                current_end = max(current_end, end)
+            else:
+                # Finalize the previous gap and start a new one
+                merged.append((current_ref, current_start, current_end, bat_protein))
+                current_ref, current_start, current_end = ref_id, start, end
+        
+        # Add the last gap
+        merged.append((current_ref, current_start, current_end, bat_protein))
+        
+        # Write to file
+        for ref_id, start, end, bp in merged:
+            outfile.write(f"{ref_id}\t{start}\t{end}\t{bp}\n")
