@@ -16,7 +16,7 @@
 source /Users/anor9792/biopython/biopython/bin/activate
 
 # Execute the Python script
-python missing_domains_muscle3.py
+python identifying_truncations.py
 
 
 echo $(date +"[%b %d %H:%M:%S] Done")
