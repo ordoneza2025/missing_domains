@@ -24,6 +24,14 @@ From the output files, the combined GTF is what we used for all subsequent analy
 
 ## Predicting ORFs from transcripts
 
+Convert GTF output file of merged transcripts into a FASTA file with this script: 
+https://github.com/ordoneza2025/missing_domains/blob/main/gtf_fasta_github.sbatch
+
+Upload the FASTA file on galaxy TransDecoder: https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fiuc%2Ftransdecoder%2Ftransdecoder%2F5.5.0%2Bgalaxy2&version=latest
+
+Run LongOrfs detection, without the predict option, with Universal genetic code, no gene-to-transcript mapping file, and a minimum protein length of 50 amino acids. 
+
+
 ## Downloading and re-formatting Uniprot domain files 
 
 These data files are found in the downloadable data for humans in ucsc. 
@@ -46,6 +54,8 @@ https://github.com/ordoneza2025/missing_domains/blob/main/fromat_Uniprot_domain_
 
 The following SLURM script runs BLASTp to annotate the FASTA file of best ORF preidctions for assembled transcripts, using the human swissprot record as the subject database. The output will be BLAST table outfmt 6. 
 https://github.com/ordoneza2025/missing_domains/blob/main/blastp.sbatch
+
+Run Transdecoder for a second time, with the same settings for predicting ORFs as above, but this time enable the Predict options with Dynamic mode and upload the BLASTp output file. Activate the option to retain best ORF per transcript and keep default of longest ORFs (500) to train Markov Model. Ouput file with be a protein FASTA file to use in the next steps. 
 
 ### 2. Finding truncations in bat transcripts
 
