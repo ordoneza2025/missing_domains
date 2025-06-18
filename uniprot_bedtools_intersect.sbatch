@@ -49,6 +49,3 @@ done
 
 # Final message
 echo "All intersections are complete."
-
-
-#| awk '{print $4, $1, $2, $3, $8, $6, $7}' OFS='\t'
