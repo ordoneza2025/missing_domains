@@ -27,25 +27,21 @@ echo Using $SLURM_NTASKS processors and $SLURM_NNODES nodes
 module load bedtools
 
 # Loop through all .bed files in the directory
-for bed_file in "${bed_files_dir}"/*.bed; do
-    # Extract the base filename without the path and remove the .bed extension
+for bed_file in "$bed_files_dir"/*.bed; do
     base_name=$(basename "$bed_file" .bed)
+    output_file="$output_dir/truncations_${base_name}.txt"
     
-    # Define the output file with .txt extension
-    output_file="${output_dir}/truncations_${base_name}.txt"
+    # Perform the intersection (overwrite each time)
+    bedtools intersect -a "$input_bed" -b "$bed_file" -wo > "$output_file"
     
-    # Perform the intersection and append to output
-    bedtools intersect -a "${input_bed}" -b "$bed_file" -wo >> "$output_file"
-    
-    # Process the file to add a new first column with the TCONS_# ID (without .p#)
+    # Add a first column with the transcript ID (col 4) minus any .pN suffix
     awk -F'\t' '{
-        match($4, /(TCONS_[0-9]+)/, id);
-        print id[1], $0;
+        tid = $4
+        sub(/\.p[0-9]+$/, "", tid)
+        print tid, $0
     }' OFS='\t' "$output_file" > "${output_file}.tmp" && mv "${output_file}.tmp" "$output_file"
     
-    # Notify completion for this file
-    echo "Intersection and processing completed for ${base_name}"
+    echo "Intersection and processing completed for $base_name"
 done
 
-# Final message
 echo "All intersections are complete."
