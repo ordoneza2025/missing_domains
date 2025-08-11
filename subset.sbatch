@@ -63,5 +63,31 @@ for domain in "${!thresholds[@]}"; do
     echo "Filtered $file with threshold ${thresholds[$domain]} -> $outfile"
 done
 
-# Final message
-echo "All domain files have been filtered."
+# Change to output directory for final processing
+cd "$outdir"
+
+# Merge all filtered files
+cat *.filtered.txt > all_truncations.txt
+total_entries=$(wc -l < all_truncations.txt)
+echo "Total entries in merged file: $total_entries"
+
+# Collapse duplicate entries
+# Key: columns 1-4, Value: columns 5-11
+# Combines multiple instances of same key with different values
+awk -F'\t' -v OFS='\t' '
+{
+    key = $1 OFS $2 OFS $3 OFS $4
+    value = $5 OFS $6 OFS $7 OFS $8 OFS $9 OFS $10 OFS $11
+    if (!seen[key,value]++) {
+        data[key] = (key in data ? data[key] OFS : "") value
+    }
+}
+END {
+    for (k in data) {
+        print k, data[k]
+    }
+}' all_truncations.txt > collapsed_truncations.txt
+
+collapsed_entries=$(wc -l < collapsed_truncations.txt)
+
+echo "Job completed $(date)"
