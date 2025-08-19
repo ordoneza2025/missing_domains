@@ -18,22 +18,28 @@
 #   - GTF annotation file
 #
 # Output:
-#   - LR_human_panel_counts.txt: Gene/transcript count matrix
-#   - LR_human_panel_transcript_counts.txt: Transcript-level counts
-#   - LR.Human.panel.gtf: Updated GTF with discovered transcripts
+#   - se.quantOnly_human_FLAIR_counts.txt: Gene/transcript count matrix
+#   - se.quantOnly_human_FLAIR_transcript_counts.txt: Transcript-level counts
+#   - se.quantOnly_human_FLAIR.gtf: Updated GTF with discovered transcripts
 #
 # Example usage:
+# work_dir="/path/to/working/directory" genome_path="/path/to/genome.fa" \
+# annotation_path="/path/to/annotation.gtf" bam_dir="/path/to/bam/files" \
 # Rscript bambu_quantification.R
 #
 # Notes:
 #   - Filters BAM files for specific organ types: ovary, lung, kidney, pancreas, 
 #     pancreatic, colon, mammary, liver
 #   - Uses FLAIR-filtered GTF annotation for transcript discovery
-#   - Automatically discovers novel transcripts during quantification
+#   - Discovery mode disabled for quantification-only analysis
 #
 ################################################################################
 
 ## Running bambu quantification for human tissues
+
+# Run job header
+cat("Job: bambu_quantification.R\n")
+cat("Job started:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 
 # Load required libraries
 suppressPackageStartupMessages({
@@ -41,24 +47,41 @@ suppressPackageStartupMessages({
   library(Rsamtools)
 })
 
+# Define input parameters and paths
+#   work_dir: working directory for analysis
+#   genome_path: path to reference genome FASTA file
+#   annotation_path: path to GTF annotation file
+#   bam_dir: directory containing BAM files
+#   output_path: directory for output files
+#   output_prefix: prefix for output filenames
+work_dir <- Sys.getenv("work_dir", "/scratch/Users/anor9792/bat_decoys/paper/human/missing_domains/domains/filtered/bambu")
+genome_path <- Sys.getenv("genome_path", "/Shares/CL_Shared/db/genomes/hg38/fa/hg38.main.fa")
+annotation_path <- Sys.getenv("annotation_path", "/Shares/CL_Shared/db/genomes/hg38/FLAIR_longread_annotation/flair_filter_transcripts.gtf")
+bam_dir <- Sys.getenv("bam_dir", "/scratch/Shares/chuong/AI/ENCODE/longread_RNAseq/ENCODE_bams")
+output_path <- Sys.getenv("output_path", "quant_only")
+output_prefix <- Sys.getenv("output_prefix", "se.quantOnly_human_FLAIR")
+
 # Set working directory
 getwd()
-setwd("/scratch/Users/anor9792/bat_decoys/paper/human/missing_domains/domains/filtered/bambu")
+setwd(work_dir)
 
 # Load genome and GTF annotation file
-genomeSequence <- "/Shares/CL_Shared/db/genomes/hg38/fa/hg38.main.fa"
-annotation <- prepareAnnotations("/Shares/CL_Shared/db/genomes/hg38/FLAIR_longread_annotation/flair_filter_transcripts.gtf")
+cat("Loading genome and annotation files...\n")
+genomeSequence <- genome_path
+annotation <- prepareAnnotations(annotation_path)
 
-# Specify the directory containing the BAM files
-bam_directory <- "/scratch/Shares/chuong/AI/ENCODE/longread_RNAseq/ENCODE_bams"
+# Define organ pattern for BAM file filtering
+#   Pattern matches files containing specific organ names followed by .bam extension
+organ_pattern <- "(ovary|lung|kidney|pancreas|pancreatic|colon|mammary|liver).*\\.bam$"
 
 # Get BAM files containing specific organ names
-organ_pattern <- "(ovary|lung|kidney|pancreas|pancreatic|colon|mammary|liver).*\\.bam$"
-file_paths_panel <- list.files(path = bam_directory, 
+cat("Searching for BAM files with target organ names...\n")
+file_paths_panel <- list.files(path = bam_dir, 
                               pattern = organ_pattern, 
                               full.names = TRUE, 
                               ignore.case = TRUE)
 
+cat("Found", length(file_paths_panel), "matching BAM files:\n")
 print(file_paths_panel)
 
 # Validate that files exist
@@ -67,16 +90,29 @@ if (length(file_paths_panel) == 0) {
 }
 
 # Read and process BAM files
+cat("Creating BamFileList object...\n")
 bamFiles_panel <- Rsamtools::BamFileList(file_paths_panel)
 head(bamFiles_panel)
 
 # Run bambu quantification
-LR.Human.panel <- bambu(reads = bamFiles_panel, 
-                       annotations = annotation, 
-                       genome = genomeSequence)
+#   discovery: set to FALSE for quantification-only mode
+#   reads: BAM files for quantification
+#   annotations: prepared GTF annotations
+#   genome: reference genome sequence
+cat("Starting bambu quantification (discovery mode disabled)...\n")
+se.quantOnly <- bambu(reads = bamFiles_panel, 
+                     annotations = annotation, 
+                     genome = genomeSequence,
+                     discovery = FALSE)
 
 # Write output files
-writeBambuOutput(LR.Human.panel, prefix = "LR_human_panel")
-writeToGTF(rowRanges(LR.Human.panel), file = "LR.Human.panel.gtf")
+#   path: output directory
+#   prefix: filename prefix for output files
+cat("Writing output files...\n")
+writeBambuOutput(se.quantOnly, path = output_path, prefix = output_prefix)
+
+cat("Output files created in directory:", output_path, "\n")
+cat("Files prefixed with:", output_prefix, "\n")
+cat("Job completed:", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "\n")
 
 ################################################################################
