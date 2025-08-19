@@ -3,24 +3,22 @@
 ################################################################################
 # Script: bambu_quantification.R
 # Description: Long-read RNA-seq quantification using bambu for human tissue samples
-# Author: [Your Name]
-# Date: [Date]
-# Version: 1.0.0
-#
+
 # Dependencies:
 #   - R >= 4.0.0
 #   - bambu >= 3.0.0
 #   - Rsamtools >= 2.8.0
-#
+
 # Input requirements:
 #   - BAM files from long-read RNA-seq experiments
 #   - Reference genome (FASTA format)
 #   - GTF annotation file
-#
+
 # Output:
 #   - se.quantOnly_human_FLAIR_counts.txt: Gene/transcript count matrix
 #   - se.quantOnly_human_FLAIR_transcript_counts.txt: Transcript-level counts
 #   - se.quantOnly_human_FLAIR.gtf: Updated GTF with discovered transcripts
+#   - se.quantOnly_human_FLAIRCPM_transcript.txt: CPM values for transcripts (normalized)
 #
 # Example usage:
 # work_dir="/path/to/working/directory" genome_path="/path/to/genome.fa" \
